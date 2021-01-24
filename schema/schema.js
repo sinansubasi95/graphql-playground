@@ -5,12 +5,15 @@ const {
     GraphQLObjectType,
     GraphQLString,
     GraphQLInt,
-    GraphQLSchema
+    GraphQLSchema,
+    GraphQLList
 } = graphql;
+
 
 const CompanyType = new GraphQLObjectType({
     name: 'Comapny',
-    fields: {
+    // Resolving Circular Reference - This function gets defined but does not get executed until after this entire file has been executed.
+    fields: () => ({
         id: {
             type: GraphQLString
         },
@@ -19,8 +22,16 @@ const CompanyType = new GraphQLObjectType({
         },
         description: {
             type: GraphQLString
+        },
+        users: {
+            // UserType is not defined yet so there will be circular reference issue.
+            type: new GraphQLList(UserType), // multiple users associated with one company.
+            resolve(parentValue, args) {
+                return axios.get(`http://localhost:3000/companies/${parentValue.id}/users`)
+                    .then(res => res.data);
+            }
         }
-    }
+    })
 });
 
 const UserType = new GraphQLObjectType({
