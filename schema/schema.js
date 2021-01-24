@@ -11,8 +11,9 @@ const {
 
 
 const CompanyType = new GraphQLObjectType({
-    name: 'Comapny',
-    // Resolving Circular Reference - This function gets defined but does not get executed until after this entire file has been executed.
+    name: 'Company',
+    // -- Resolving Circular Reference --
+    // This function gets defined but does not get executed until this entire file has been executed.
     fields: () => ({
         id: {
             type: GraphQLString
@@ -55,6 +56,27 @@ const UserType = new GraphQLObjectType({
         }
     }
 });
+
+// -- Query Fragments --
+// List of different properties that we want to get access to.
+// Purpose of Query Fragments is to avoid writing same fields over and over again.
+
+/* GraphiQL ->
+    {
+        apple: company(id: "1") {
+            ...companyDetails
+        },
+        google: company(id: "2") {
+            ...companyDetails
+        }
+    }
+
+    fragment companyDetails on Company {
+        id,
+        name,
+        description
+    }
+*/
 
 const RootQuery = new GraphQLObjectType({
     name: 'RootQueryType',
