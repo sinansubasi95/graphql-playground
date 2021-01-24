@@ -6,7 +6,8 @@ const {
     GraphQLString,
     GraphQLInt,
     GraphQLSchema,
-    GraphQLList
+    GraphQLList,
+    GraphQLNonNull
 } = graphql;
 
 
@@ -108,6 +109,40 @@ const RootQuery = new GraphQLObjectType({
     }
 });
 
+// -- Mutations --
+// Mutations are used to change data in some fashion
+// Mutations can be used in CRUD records
+
+const mutation = new GraphQLObjectType({
+    name: 'Mutation',
+    fields: {
+        addUser: {
+            type: UserType,
+            args: {
+                firstName: { type: new GraphQLNonNull(GraphQLString) },
+                age: { type: new graphql.GraphQLNonNull(GraphQLInt) },
+                companyId: { type: GraphQLString }
+            },
+            resolve(parentValue, { firstName, age }) { // destructure args object
+                return axios.post('http://localhost:3000/users', { firstName, age })
+                    .then(res => res.data);
+            }
+        }
+    }
+});
+
+/* GraphiQL
+    mutation {
+        addUser(firstName: "Stephen", age: 26) {
+            // We must then ask for some properties coming back off from resolve function
+            id,
+            firstName,
+            age
+        }
+    }
+*/
+
 module.exports = new GraphQLSchema({
-    query: RootQuery
+    query: RootQuery,
+    mutation // ES6 feature -> mutation: mutation
 });
