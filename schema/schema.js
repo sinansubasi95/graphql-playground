@@ -127,13 +127,35 @@ const mutation = new GraphQLObjectType({
                 return axios.post('http://localhost:3000/users', { firstName, age })
                     .then(res => res.data);
             }
+        },
+        deleteUser: {
+            type: UserType,
+            args: {
+                id: { type: new GraphQLNonNull(GraphQLString) }
+            },
+            resolve(parentValue, { id }) {
+                return axios.delete(`http://localhost:3000/users/${id}`, { id })
+                    .then(res => res.data);
+            }
+        },
+        editUser: {
+            type: UserType,
+            args: {
+                id: { type: new GraphQLNonNull(GraphQLString) },
+                firstName: { type: GraphQLString },
+                age: { type: GraphQLInt },
+            },
+            resolve(parentValue, { id, firstName, age}) {
+                return axios.patch(`http://localhost:3000/users/${id}`, { firstName, age })
+                    .then(res => res.data);
+            }
         }
     }
 });
 
 /* GraphiQL
     mutation {
-        addUser(firstName: "Stephen", age: 26) {
+        addUser(firstName: "Sinan", age: 26) {
             // We must then ask for some properties coming back off from resolve function
             id,
             firstName,
